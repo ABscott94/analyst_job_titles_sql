@@ -76,6 +76,7 @@ SELECT COMPANY,
 	AVG(STAR_RATING) AS AVG_RATING
 FROM DATA_ANALYST_JOBS
 WHERE REVIEW_COUNT > 5000
+and company is not null
 GROUP BY COMPANY;
 
 --40 (41 including null)
@@ -86,6 +87,7 @@ select COMPANY,
 	round(AVG(STAR_RATING),9) AS AVG_RATING
 FROM DATA_ANALYST_JOBS
 WHERE REVIEW_COUNT > 5000
+and company is not null
 GROUP BY COMPANY
 order by avg_rating desc;
 
@@ -93,37 +95,27 @@ order by avg_rating desc;
 
 /*11)Find all the job titles that contain the word ‘Analyst’. How many different job titles are there?*/
 
-SELECT COUNT(TITLE)
+SELECT COUNT(distinct(TITLE))
 FROM DATA_ANALYST_JOBS
-WHERE TITLE like '%Analyst%'
-or title like '%analyst%'
-or title like '%ANALYST%';
+WHERE lower(TITLE) like '%analyst%';
 
---1669 (1636 with just 'Analyst')
+--774
 
 /*12a)How many different job titles do not contain either the word ‘Analyst’ or the word ‘Analytics’?*/
 
 SELECT count(distinct(TITLE))
 FROM DATA_ANALYST_JOBS
-WHERE TITLE not like '%Analyst%'
-	AND TITLE not like '%Analytics%'
-	and title not like '%analyst%'
-	and title not like '%analytics%'
-	and title not like '%ANALYST%'
-	and title not like '%ANALYTICS%';
+WHERE lower(TITLE) not like '%analyst%'
+	AND lower(TITLE) not like '%analytics%';
 	
---4 (26 with just 'Analyst' and 'Analytics')
+--4
 
 /*12b)What word do these positions have in common?*/
 
 select distinct(title)
 from data_analyst_jobs
-where title not like '%Analyst%'
-	and title not like '%Analytics%'
-	and title not like '%analyst%'
-	and title not like '%analytics%'
-	and title not like '%ANALYST%'
-	and title not like '%ANALYTICS%';
+where lower(title) not like '%analyst%'
+	and lower(title) not like '%analytics%'
 
 --All 4 of the titles contain Tableau while 3 of them contain Data
 
@@ -132,20 +124,13 @@ where title not like '%Analyst%'
 select domain, count(title) as hard_to_fill
 from data_analyst_jobs
 where days_since_posting > 21
+and lower(skill) like '%sql%'
 and domain is not null
 group by domain
 order by hard_to_fill desc;
 
---Health Care, Internet and Software, and Banks and Financial Services
+--Consulting and Business Services, Health Care, Internet and Software, and Banks and Financial Services
 
 /*BonusB)How many jobs have been listed for more than 3 weeks for each of the top 4?*/
 
-select sum(count(title)) as hardest_to_fill
-from data_analyst_jobs
-where days_since_posting > 21
-and domain = 'Consulting and Business Services'
-and domain = 'Health Care'
-and domain = 'Internet and Software'
-and domain = 'Banks and Financial Services';
-
---367
+--232
